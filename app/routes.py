@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request,session
 from app import app, query_db
 from app.forms import IndexForm, PostForm, FriendsForm, ProfileForm, CommentsForm
 from datetime import datetime
@@ -15,11 +15,11 @@ def index():
     if form.login.is_submitted() and form.login.submit.data:
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
         if user == None:
-            flash('Username or password is incorrect!')
+            flash('Sorry, this user does not exist!')
         elif user['password'] == form.login.password.data:
             return redirect(url_for('stream', username=form.login.username.data))
         else:
-            flash('Username or password is incorrect!')
+            flash('Sorry, wrong password!')
 
     elif form.register.is_submitted() and form.register.submit.data:
         query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES("{}", "{}", "{}", "{}");'.format(form.register.username.data, form.register.first_name.data,
@@ -84,3 +84,9 @@ def profile(username):
     
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
     return render_template('profile.html', title='profile', username=username, user=user, form=form)
+
+@app.route('/ShowAbout', methods=['GET', 'POST'])
+def ShowAbout():
+    username = session.get("username", None)
+    user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
+    return render_template('ShowAbout.html', title='ShowAbout', username=username, user=user)
