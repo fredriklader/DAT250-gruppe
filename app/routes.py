@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from app import app, query_db
 from app.forms import IndexForm, PostForm, FriendsForm, ProfileForm, CommentsForm
 from datetime import datetime
@@ -9,10 +9,20 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email, Length
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
+from functools import wraps
 
+# from config import User
+# from django.contrib.auth import get_user_model
+# User = get_user_model()
+# from django.contrib.auth.models import get_user_model
+# User = get_user_model()
 # this file contains all the different routes, and the logic for communicating with the database
-
+# login = LoginManager(app)
+# login.login_view="index"
 # home page/login/registration
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -23,24 +33,58 @@ def index():
         if user == None:
             flash('Username or password is incorrect!')
         elif check_password_hash(user['password'], form.login.password.data):
+
+            # user = User(
+            #     user_id=user["id"],
+            #     username=user["username"]
+            # )
+            # login_user(user["id"])
+            session["username"] = user['username']
+            print(session.get("username"))
+            #User(user_id=user["id"], username=user["username"])
             return redirect(url_for('stream', username=form.login.username.data))
         else:
             flash('Username or password is incorrect!')
 
     elif form.register.is_submitted() and form.register.submit.data:
         hash_password=generate_password_hash(form.register.password.data, method="sha256", salt_length=8)
-        if form.register.password.data==form.register.confirm_password.data:
+        if query_db('SELECT * FROM Users WHERE username="{}";'.format(form.register.username.data), one=True)!=None:
+            flash("Sorry, username already exist!")
+        elif form.register.password.data==form.register.confirm_password.data and len(form.register.password.data)>=4 and len(form.register.username.data)>=4:
             query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES("{}", "{}", "{}", "{}");'.format(form.register.username.data, form.register.first_name.data,
             form.register.last_name.data, hash_password))
+        elif len(form.register.username.data)<=4:
+            flash('Username must contain at least 4 characters')
+        elif len(form.register.password.data)<=4:
+            flash('Password must contain at least 8 characters')
         else:
             flash('Sorry, passwords do not match!')
         return redirect(url_for('index'))
     return render_template('index.html', title='Welcome', form=form)
 
+# @login.user_loader
+# def load_user(user_id):
+#     user = query_db('SELECT * FROM Users WHERE id="{}";'. format(user_id), one=True)
+#     if user is None:
+#         return None
+#     else:
+#         return User(user_id, user[1])
+# @login.user_loader
+# def load_user(user_id):
+#     user = query_db('SELECT * FROM Users WHERE id="{}";'. format(user_id), one=True)
+#     if user is None:
+#         return None
+#     else:
+#         # return User.get(user_id)
+#         return User(user_id, user[1])
 
 # content stream page
 @app.route('/stream/<username>', methods=['GET', 'POST'])
+# @login_required
 def stream(username):
+    if session.get("username") != username:
+        return redirect(url_for('index'))
+    
     form = PostForm()
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
     if form.is_submitted():
@@ -57,7 +101,10 @@ def stream(username):
 
 # comment page for a given post and user.
 @app.route('/comments/<username>/<int:p_id>', methods=['GET', 'POST'])
+# @login_required
 def comments(username, p_id):
+    if session.get("username") != username:
+        return redirect(url_for('index'))
     form = CommentsForm()
     if form.is_submitted():
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
@@ -69,7 +116,10 @@ def comments(username, p_id):
 
 # page for seeing and adding friends
 @app.route('/friends/<username>', methods=['GET', 'POST'])
+# @login_required
 def friends(username):
+    if session.get("username") != username:
+        return redirect(url_for('index'))
     form = FriendsForm()
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
     if form.is_submitted():
@@ -84,7 +134,10 @@ def friends(username):
 
 # see and edit detailed profile information of a user
 @app.route('/profile/<username>', methods=['GET', 'POST'])
+# @login_required
 def profile(username):
+    if session.get("username") != username:
+        return redirect(url_for('index'))
     form = ProfileForm()
     if form.is_submitted():
         query_db('UPDATE Users SET education="{}", employment="{}", music="{}", movie="{}", nationality="{}", birthday=\'{}\' WHERE username="{}" ;'.format(
@@ -94,3 +147,25 @@ def profile(username):
     
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
     return render_template('profile.html', title='profile', username=username, user=user, form=form)
+
+@app.route('/ShowAbout/<username>', methods=['GET', 'POST'])
+# @login_required
+def ShowAbout(username):
+
+    #username = session.get("username", None)
+    username=username
+    user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
+    return render_template('ShowAbout.html', title='ShowAbout', friend=username, user=user, username=session.get("username"))
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    session["username"]=None
+    return redirect(url_for('index'))
+    
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('username') is None:
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
