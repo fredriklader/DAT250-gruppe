@@ -5,6 +5,12 @@ from flask_bootstrap import Bootstrap
 import sqlite3
 import os
 
+
+#Nytt
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField
+from wtforms.validators import InputRequired, Email, Length
+
 # create and configure app
 app = Flask(__name__)
 Bootstrap(app)

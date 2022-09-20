@@ -4,6 +4,12 @@ from app.forms import IndexForm, PostForm, FriendsForm, ProfileForm, CommentsFor
 from datetime import datetime
 import os
 
+#Nytt
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField
+from wtforms.validators import InputRequired, Email, Length
+from werkzeug.security import generate_password_hash, check_password_hash
+
 # this file contains all the different routes, and the logic for communicating with the database
 
 # home page/login/registration
@@ -16,14 +22,18 @@ def index():
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
         if user == None:
             flash('Username or password is incorrect!')
-        elif user['password'] == form.login.password.data:
+        elif check_password_hash(user['password'], form.login.password.data):
             return redirect(url_for('stream', username=form.login.username.data))
         else:
             flash('Username or password is incorrect!')
 
     elif form.register.is_submitted() and form.register.submit.data:
-        query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES("{}", "{}", "{}", "{}");'.format(form.register.username.data, form.register.first_name.data,
-         form.register.last_name.data, form.register.password.data))
+        hash_password=generate_password_hash(form.register.password.data, method="sha256", salt_length=8)
+        if form.register.password.data==form.register.confirm_password.data:
+            query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES("{}", "{}", "{}", "{}");'.format(form.register.username.data, form.register.first_name.data,
+            form.register.last_name.data, hash_password))
+        else:
+            flash('Sorry, passwords do not match!')
         return redirect(url_for('index'))
     return render_template('index.html', title='Welcome', form=form)
 
