@@ -32,56 +32,44 @@ def index():
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
         if user == None:
             flash('Username or password is incorrect!')
+        #checking the password entered with the password in the database
         elif check_password_hash(user['password'], form.login.password.data):
-
-            # user = User(
-            #     user_id=user["id"],
-            #     username=user["username"]
-            # )
-            # login_user(user["id"])
+            #storing username in session for url managment
             session["username"] = user['username']
-            print(session.get("username"))
-            #User(user_id=user["id"], username=user["username"])
             return redirect(url_for('stream', username=form.login.username.data))
         else:
             flash('Username or password is incorrect!')
 
     elif form.register.is_submitted() and form.register.submit.data:
+        #Hashing password with salt
         hash_password=generate_password_hash(form.register.password.data, method="sha256", salt_length=8)
+        #checking if username already exist
         if query_db('SELECT * FROM Users WHERE username="{}";'.format(form.register.username.data), one=True)!=None:
             flash("Sorry, username already exist!")
-        elif form.register.password.data==form.register.confirm_password.data and len(form.register.password.data)>=4 and len(form.register.username.data)>=4:
+        #checking if confirm password and password is equal, and the length of username and password. Adding to database
+        elif form.register.password.data==form.register.confirm_password.data and len(form.register.password.data)>=8 and len(form.register.username.data)>=4:
             query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES("{}", "{}", "{}", "{}");'.format(form.register.username.data, form.register.first_name.data,
             form.register.last_name.data, hash_password))
+        #Printing if username is to short
         elif len(form.register.username.data)<=4:
             flash('Username must contain at least 4 characters')
-        elif len(form.register.password.data)<=4:
+        #Printing if password is to short
+        elif len(form.register.password.data)<8:
             flash('Password must contain at least 8 characters')
+        #Printing if password and confirm password is not equal
         else:
             flash('Sorry, passwords do not match!')
         return redirect(url_for('index'))
     return render_template('index.html', title='Welcome', form=form)
 
-# @login.user_loader
-# def load_user(user_id):
-#     user = query_db('SELECT * FROM Users WHERE id="{}";'. format(user_id), one=True)
-#     if user is None:
-#         return None
-#     else:
-#         return User(user_id, user[1])
-# @login.user_loader
-# def load_user(user_id):
-#     user = query_db('SELECT * FROM Users WHERE id="{}";'. format(user_id), one=True)
-#     if user is None:
-#         return None
-#     else:
-#         # return User.get(user_id)
-#         return User(user_id, user[1])
+
 
 # content stream page
 @app.route('/stream/<username>', methods=['GET', 'POST'])
 # @login_required
 def stream(username):
+    #redirects to index.html if urls username is not equal to session username. 
+    #Session username is only set thrue index.html
     if session.get("username") != username:
         return redirect(url_for('index'))
     
@@ -103,6 +91,8 @@ def stream(username):
 @app.route('/comments/<username>/<int:p_id>', methods=['GET', 'POST'])
 # @login_required
 def comments(username, p_id):
+    #redirects to index.html if urls username is not equal to session username. 
+    #Session username is only set thrue index.html
     if session.get("username") != username:
         return redirect(url_for('index'))
     form = CommentsForm()
@@ -118,6 +108,8 @@ def comments(username, p_id):
 @app.route('/friends/<username>', methods=['GET', 'POST'])
 # @login_required
 def friends(username):
+    #redirects to index.html if urls username is not equal to session username. 
+    #Session username is only set thrue index.html
     if session.get("username") != username:
         return redirect(url_for('index'))
     form = FriendsForm()
@@ -136,6 +128,8 @@ def friends(username):
 @app.route('/profile/<username>', methods=['GET', 'POST'])
 # @login_required
 def profile(username):
+    #redirects to index.html if urls username is not equal to session username. 
+    #Session username is only set thrue index.html
     if session.get("username") != username:
         return redirect(url_for('index'))
     form = ProfileForm()
@@ -151,7 +145,7 @@ def profile(username):
 @app.route('/ShowAbout/<username>', methods=['GET', 'POST'])
 # @login_required
 def ShowAbout(username):
-
+    #username is friends username
     #username = session.get("username", None)
     username=username
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
@@ -159,13 +153,6 @@ def ShowAbout(username):
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
+    #clear session username and redirects to index.html
     session["username"]=None
     return redirect(url_for('index'))
-    
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('username') is None:
-            return redirect(url_for('index'))
-        return f(*args, **kwargs)
-    return decorated_function
