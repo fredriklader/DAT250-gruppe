@@ -41,7 +41,7 @@ def index():
     if form.login.is_submitted() and form.login.submit.data:
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
         #Denies user with 5 or more login attemps
-        if int(session.get("count")) >= 5:
+        if int(session.get("count")) >= 4:
             flash('To many attemps!')
         elif user == None:
             flash('Username or password is incorrect!')
