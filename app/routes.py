@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired, Email, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from functools import wraps
-
+from datetime import timedelta
 # from config import User
 # from django.contrib.auth import get_user_model
 # User = get_user_model()
@@ -21,24 +21,41 @@ from functools import wraps
 # login = LoginManager(app)
 # login.login_view="index"
 # home page/login/registration
+#session["count"]=0
+
+#Session attempt counter deletet after x minutes
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=1)
 
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = IndexForm()
+    #Initialise session counter to 0
+    if session.get("count")==None:
+        session["count"]=0
 
     if form.login.is_submitted() and form.login.submit.data:
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
-        if user == None:
+        #Denies user with 5 or more login attemps
+        if int(session.get("count")) >= 5:
+            flash('To many attemps!')
+        elif user == None:
             flash('Username or password is incorrect!')
+            #if username does not exist add session count +1
+            session["count"]=int(session.get("count")) +1
         #checking the password entered with the password in the database
         elif check_password_hash(user['password'], form.login.password.data):
             #storing username in session for url managment
             session["username"] = user['username']
             return redirect(url_for('stream', username=form.login.username.data))
         else:
+            #if password is incorrect add session count +1
             flash('Username or password is incorrect!')
+            session["count"]=int(session.get("count")) +1
 
     elif form.register.is_submitted() and form.register.submit.data:
         #Hashing password with salt
@@ -72,7 +89,8 @@ def stream(username):
     #Session username is only set thrue index.html
     if session.get("username") != username:
         return redirect(url_for('index'))
-    
+    #if logged in to account, session count is set back to 0
+    session["count"]=0
     form = PostForm()
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
     if form.is_submitted():
