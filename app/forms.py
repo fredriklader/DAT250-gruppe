@@ -29,7 +29,7 @@ class RegisterForm(FlaskForm):
     last_name = StringField('Last Name', render_kw={'placeholder': 'Last Name'})
     # username = StringField('Username', validators=[InputRequired(), Length(min=3, max=15, message="At least 3 characters")], render_kw={'placeholder': 'Username'})
     username = StringField('Username', validators=[InputRequired("Username must contain at least 4 characters!"), Length(min=4, max=15, message="Username must contain at least 4 characters!")], render_kw={'placeholder': 'Username'})
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=4, max=15, message="At least 2 characters")], render_kw={'placeholder': 'Password'})    
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=4, max=15, message="At least 4 characters")], render_kw={'placeholder': 'Password'})    
     confirm_password = PasswordField('Confirm Password', render_kw={'placeholder': 'Confirm Password'})
     submit = SubmitField('Sign Up')
 

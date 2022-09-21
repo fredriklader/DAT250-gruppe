@@ -11,6 +11,8 @@ from wtforms.validators import InputRequired, Email, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from functools import wraps
+import unicodedata
+
 
 # from config import User
 # from django.contrib.auth import get_user_model
@@ -156,3 +158,11 @@ def logout():
     #clear session username and redirects to index.html
     session["username"]=None
     return redirect(url_for('index'))
+
+def validations(s):
+    for c in s:
+        cat = unicodedata.category(c)
+        # Ll=lowercase, Lu=uppercase, Lo=ideographs, Nd=Numbers, All Z* is spaces 
+        if cat not in ('Ll','Lu','Lo','Nd','Zs', 'Zl', 'Zp'):
+            return False    
+    return True
