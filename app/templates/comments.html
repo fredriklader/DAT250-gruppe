@@ -15,7 +15,7 @@
                 <div class="card-body">
                     <p class="card-text">{{post.content}}</p>
                     {% if post.image %}
-                    <img src="{{'/static/uploads/' + post.image}}" class="card-img-bottom">
+                    <img src="{{'/static/uploads/' + post.image}}" class="card-img-bottom" multiple accept="image/*,audio/*,video/*">
                     {% endif %}
                     <h4 class="card-text">Comments</h4>
                     <form action="" method="POST" novalidate>

@@ -1,5 +1,5 @@
 from email.mime import message
-from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FormField, TextAreaField, FileField
 from wtforms.fields.html5 import DateField
 from app import app, query_db
@@ -39,7 +39,7 @@ class IndexForm(FlaskForm):
 #UserMixin,
 class PostForm(FlaskForm):
     content = TextAreaField('New Post', render_kw={'placeholder': 'What are you thinking about?'})
-    image = FileField('Image')
+    image = FileField('Image', render_kw={"class": "custom-file-input"}, validators=[FileRequired(), FileAllowed(['jpg', 'png', 'img'], 'Images only!')])
     submit = SubmitField('Post')
 
 class CommentsForm( FlaskForm):
