@@ -41,7 +41,7 @@ class IndexForm(FlaskForm):
 #UserMixin,
 class PostForm(FlaskForm):
     content = TextAreaField('New Post', render_kw={'placeholder': 'What are you thinking about?'})
-    image = FileField('Image', render_kw={"class": "custom-file-input"}, validators=[FileRequired(), FileAllowed(['jpg', 'png', 'img'], 'Images only!')])
+    image = FileField('Image')
     submit = SubmitField('Post')
 
 class CommentsForm( FlaskForm):
