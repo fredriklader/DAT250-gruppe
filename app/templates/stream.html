@@ -7,9 +7,9 @@
             <div class="card">
                 <div class="card-body">
                     <h1>Share something</h1>
-                    <form action="" method="POST" novalidate enctype="multipart/form-data">
+                    <form action="" method="POST" enctype="multipart/form-data">
                         {{ wtf.form_field(form.content) }}
-                        {{ wtf.form_field(form.image) }}
+                        {{ wtf.form_field(form.image, class="custom-file-input") }}
                         {{ wtf.form_field(form.submit, class="btn btn-primary") }}
                     </form>
                 </div>
@@ -22,7 +22,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="row align-items-center">
-                        <a class="col-4"><span class="fa fa-user" style="font-size: 25px"></span>&nbsp;{{post.username}}</a>
+                        <a class="col-4" href={{url_for('ShowAbout', username=post.username)}}><span class="fa fa-user" style="font-size: 25px"></span>&nbsp;{{post.username}}</a>
                         <span class="col-8 text-right">{{post.creation_time}}</span>
                     </div>
                 </div>

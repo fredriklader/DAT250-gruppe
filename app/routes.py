@@ -11,9 +11,13 @@ from wtforms.validators import InputRequired, Email, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from functools import wraps
+<<<<<<< HEAD
 import unicodedata
 
 
+=======
+from datetime import timedelta
+>>>>>>> 382377aa1088d5a5a8828fc2ad6880edf66e247e
 # from config import User
 # from django.contrib.auth import get_user_model
 # User = get_user_model()
@@ -23,24 +27,41 @@ import unicodedata
 # login = LoginManager(app)
 # login.login_view="index"
 # home page/login/registration
+#session["count"]=0
+
+#Session attempt counter deletet after 5 minutes
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
 
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = IndexForm()
+    #Initiaxlise session counter to 0
+    if session.get("count")==None:
+        session["count"]=0
 
     if form.login.is_submitted() and form.login.submit.data:
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
-        if user == None:
+        #Denies user with 5 or more login attemps
+        if int(session.get("count")) >= 4:
+            flash('To many attemps!')
+        elif user == None:
             flash('Username or password is incorrect!')
+            #if username does not exist add session count +1
+            session["count"]=int(session.get("count")) +1
         #checking the password entered with the password in the database
         elif check_password_hash(user['password'], form.login.password.data):
             #storing username in session for url managment
             session["username"] = user['username']
             return redirect(url_for('stream', username=form.login.username.data))
         else:
+            #if password is incorrect add session count +1
             flash('Username or password is incorrect!')
+            session["count"]=int(session.get("count")) +1
 
     elif form.register.is_submitted() and form.register.submit.data:
         #Hashing password with salt
@@ -60,7 +81,7 @@ def index():
             flash('Password must contain at least 8 characters')
         #Printing if password and confirm password is not equal
         else:
-            flash('Sorry, passwords do not match!')
+            flash('Sorry, passwords does not match!')
         return redirect(url_for('index'))
     return render_template('index.html', title='Welcome', form=form)
 
@@ -74,10 +95,11 @@ def stream(username):
     #Session username is only set thrue index.html
     if session.get("username") != username:
         return redirect(url_for('index'))
-    
+    #if logged in to account, session count is set back to 0
+    session["count"]=0
     form = PostForm()
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
-    if form.is_submitted():
+    if form.is_submitted() and form.validate_on_submit:
         if form.image.data:
             path = os.path.join(app.config['UPLOAD_PATH'], form.image.data.filename)
             form.image.data.save(path)
@@ -85,7 +107,8 @@ def stream(username):
 
         query_db('INSERT INTO Posts (u_id, content, image, creation_time) VALUES({}, "{}", "{}", \'{}\');'.format(user['id'], form.content.data, form.image.data.filename, datetime.now()))
         return redirect(url_for('stream', username=username))
-
+    else:
+        flash('Only jpg, png and img files are allowed!')
     posts = query_db('SELECT p.*, u.*, (SELECT COUNT(*) FROM Comments WHERE p_id=p.id) AS cc FROM Posts AS p JOIN Users AS u ON u.id=p.u_id WHERE p.u_id IN (SELECT u_id FROM Friends WHERE f_id={0}) OR p.u_id IN (SELECT f_id FROM Friends WHERE u_id={0}) OR p.u_id={0} ORDER BY p.creation_time DESC;'.format(user['id']))
     return render_template('stream.html', title='Stream', username=username, form=form, posts=posts)
 

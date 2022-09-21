@@ -11,13 +11,17 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email, Length
 
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
 # create and configure app
 app = Flask(__name__)
 Bootstrap(app)
 app.config.from_object(Config)
 
 # TODO: Handle login management better, maybe with flask_login?
-#login = LoginManager(app)
+# login_manager = LoginManager(app)
+# login_manager.login_view="login"
+
 
 # get an instance of the db
 def get_db():
