@@ -11,13 +11,7 @@ from wtforms.validators import InputRequired, Email, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from functools import wraps
-<<<<<<< HEAD
-import unicodedata
-
-
-=======
 from datetime import timedelta
->>>>>>> 382377aa1088d5a5a8828fc2ad6880edf66e247e
 # from config import User
 # from django.contrib.auth import get_user_model
 # User = get_user_model()

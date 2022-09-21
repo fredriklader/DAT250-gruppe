@@ -8,6 +8,8 @@ from app import app, query_db
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Length, DataRequired
+from wtforms_validators import AlphaNumeric
+
 
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from wsgiref.validate import validator
@@ -43,7 +45,7 @@ class PostForm(FlaskForm):
     submit = SubmitField('Post')
 
 class CommentsForm( FlaskForm):
-    comment = TextAreaField('New Comment', render_kw={'placeholder': 'What do you have to say?'})
+    comment = TextAreaField('New Comment', [DataRequired(), AlphaNumeric()], render_kw={'placeholder': 'What do you have to say?'})
     submit = SubmitField('Comment')
 
 class FriendsForm( FlaskForm):
