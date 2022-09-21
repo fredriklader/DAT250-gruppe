@@ -23,7 +23,7 @@ from datetime import timedelta
 # home page/login/registration
 #session["count"]=0
 
-#Session attempt counter deletet after x minutes
+#Session attempt counter deletet after 5 minutes
 @app.before_request
 def make_session_permanent():
     session.permanent = True
@@ -34,7 +34,7 @@ def make_session_permanent():
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = IndexForm()
-    #Initialise session counter to 0
+    #Initiaxlise session counter to 0
     if session.get("count")==None:
         session["count"]=0
 
@@ -75,7 +75,7 @@ def index():
             flash('Password must contain at least 8 characters')
         #Printing if password and confirm password is not equal
         else:
-            flash('Sorry, passwords do not match!')
+            flash('Sorry, passwords does not match!')
         return redirect(url_for('index'))
     return render_template('index.html', title='Welcome', form=form)
 
