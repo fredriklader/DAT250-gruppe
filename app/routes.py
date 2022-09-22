@@ -13,16 +13,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from functools import wraps
 from datetime import timedelta
+from config import User
 # from config import User
 # from django.contrib.auth import get_user_model
 # User = get_user_model()
 # from django.contrib.auth.models import get_user_model
 # User = get_user_model()
 # this file contains all the different routes, and the logic for communicating with the database
-# login = LoginManager(app)
-# login.login_view="index"
-# home page/login/registration
-#session["count"]=0
+
 
 #Session attempt counter deletet after 5 minutes
 @app.before_request
@@ -30,6 +28,16 @@ def make_session_permanent():
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=5)
 
+login = LoginManager(app)
+login.login_view="index"
+
+@login.user_loader
+def load_user(user_id):
+    user = query_db('SELECT * FROM Users WHERE id="{}";'. format(user_id), one=True)
+    if user is None:
+        return None
+    else:
+        return User(user_id, user[1])
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -50,6 +58,9 @@ def index():
             session["count"]=int(session.get("count")) +1
         #checking the password entered with the password in the database
         elif check_password_hash(user['password'], form.login.password.data):
+            #logs in user with flask-login
+            user2=User(id=user["id"], username=user["username"])
+            login_user(user2)
             #storing username in session for url managment
             session["username"] = user['username']
             return redirect(url_for('stream', username=form.login.username.data))
@@ -84,7 +95,7 @@ def index():
 
 # content stream page
 @app.route('/stream/<username>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def stream(username):
     #redirects to index.html if urls username is not equal to session username. 
     #Session username is only set thrue index.html
@@ -99,7 +110,6 @@ def stream(username):
             path = os.path.join(app.config['UPLOAD_PATH'], form.image.data.filename)
             form.image.data.save(path)
 
-
         query_db('INSERT INTO Posts (u_id, content, image, creation_time) VALUES({}, "{}", "{}", \'{}\');'.format(user['id'], form.content.data, form.image.data.filename, datetime.now()))
         return redirect(url_for('stream', username=username))
     posts = query_db('SELECT p.*, u.*, (SELECT COUNT(*) FROM Comments WHERE p_id=p.id) AS cc FROM Posts AS p JOIN Users AS u ON u.id=p.u_id WHERE p.u_id IN (SELECT u_id FROM Friends WHERE f_id={0}) OR p.u_id IN (SELECT f_id FROM Friends WHERE u_id={0}) OR p.u_id={0} ORDER BY p.creation_time DESC;'.format(user['id']))
@@ -107,7 +117,7 @@ def stream(username):
 
 # comment page for a given post and user.
 @app.route('/comments/<username>/<int:p_id>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def comments(username, p_id):
     #redirects to index.html if urls username is not equal to session username. 
     #Session username is only set thrue index.html
@@ -124,7 +134,7 @@ def comments(username, p_id):
 
 # page for seeing and adding friends
 @app.route('/friends/<username>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def friends(username):
     #redirects to index.html if urls username is not equal to session username. 
     #Session username is only set thrue index.html
@@ -144,7 +154,7 @@ def friends(username):
 
 # see and edit detailed profile information of a user
 @app.route('/profile/<username>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def profile(username):
     #redirects to index.html if urls username is not equal to session username. 
     #Session username is only set thrue index.html
@@ -161,17 +171,18 @@ def profile(username):
     return render_template('profile.html', title='profile', username=username, user=user, form=form)
 
 @app.route('/ShowAbout/<username>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def ShowAbout(username):
-    #username is friends username
-    #username = session.get("username", None)
-    username=username
+    #redirects to index.html if urls username is not equal to session username. 
+    #Session username is only set thrue index.html
+    friend=username
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
-    return render_template('ShowAbout.html', title='ShowAbout', friend=username, user=user, username=session.get("username"))
+    return render_template('ShowAbout.html', title='ShowAbout', friend=friend, user=user, username=session.get("username"))
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     #clear session username and redirects to index.html
+    logout_user()
     session["username"]=None
     return redirect(url_for('index'))
 
