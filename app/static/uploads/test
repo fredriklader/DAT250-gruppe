@@ -1,0 +1,9 @@
+int main(int argc, char* argv[])
+{
+    // print the command-line arguments in order
+    for (int i = 0; i < argc; i++) {
+        printf("Argument %d: %s \n", i, argv[i]);
+    }
+    for(int i = 0; i )
+    return 0;
+}
