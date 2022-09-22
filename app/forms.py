@@ -20,26 +20,6 @@ from wsgiref.validate import validator
 # login_manager.login_view="login"
 #UserMixin,
 
-text_validators = [
-    Regexp(
-        '[a-zA-Z0-9_.,!?-]$', 
-        message="Only letters and numbers, no special characters."),
-    Length(
-        min=3,
-        max=400,
-        message="Your message must be in between 3 and 400 characters."),
-]
-
-profile_validators = [
-    Regexp(
-        '[a-zA-Z0-9]',
-        message="Can only use letters and numbers."),
-    Length(
-        min=2,
-        max=50,
-        message="Your input needs to be between 2 and 50 characters"),
-]
-
 class LoginForm( FlaskForm):
     username = StringField('Username', render_kw={'placeholder': 'Username'})
     password = PasswordField('Password', render_kw={'placeholder': 'Password'})
@@ -60,12 +40,12 @@ class IndexForm(FlaskForm):
     register = FormField(RegisterForm)
 #UserMixin, 
 class PostForm(FlaskForm):
-    content = TextAreaField('New Post', validators=[Length(max=300),Regexp('[a-zA-Z0-9]', message='Only letters and numbers')], render_kw={'placeholder': 'What are you thinking about?'})
+    content = TextAreaField('New Post', validators=[Length(max=300), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters and numbers and .,!?')], render_kw={'placeholder': 'What are you thinking about?'})
     image = FileField('Image')
     submit = SubmitField('Post')
 
 class CommentsForm( FlaskForm):
-    comment = TextAreaField('New Comment', text_validators, render_kw={'placeholder': 'What do you have to say?'})
+    comment = TextAreaField('New Comment', validators=[Length(max=150), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')] , render_kw={'placeholder': 'What do you have to say?'})
     submit = SubmitField('Comment')
 
 class FriendsForm( FlaskForm):
@@ -73,10 +53,10 @@ class FriendsForm( FlaskForm):
     submit = SubmitField('Add Friend')
 
 class ProfileForm( FlaskForm):
-    education = StringField('Education', profile_validators, render_kw={'placeholder': 'Highest education'})
-    employment = StringField('Employment', profile_validators, render_kw={'placeholder': 'Current employment'})
-    music = StringField('Favorite song', profile_validators, render_kw={'placeholder': 'Favorite song'})
-    movie = StringField('Favorite movie', profile_validators, render_kw={'placeholder': 'Favorite movie'})
-    nationality = StringField('Nationality', profile_validators, render_kw={'placeholder': 'Your nationality'})
+    education = StringField('Education', render_kw={'placeholder': 'Highest education'})
+    employment = StringField('Employment', render_kw={'placeholder': 'Current employment'})
+    music = StringField('Favorite song', render_kw={'placeholder': 'Favorite song'})
+    movie = StringField('Favorite movie', render_kw={'placeholder': 'Favorite movie'})
+    nationality = StringField('Nationality', render_kw={'placeholder': 'Your nationality'})
     birthday = DateField('Birthday')
     submit = SubmitField('Update Profile')

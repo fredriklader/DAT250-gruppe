@@ -105,11 +105,10 @@ def stream(username):
     session["count"]=0
     form = PostForm()
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
-    if form.is_submitted():
+    if form.validate_on_submit():
         if form.image.data:
             path = os.path.join(app.config['UPLOAD_PATH'], form.image.data.filename)
-            form.image.data.save(path)
-
+            form.image.data.save(path) 
         query_db('INSERT INTO Posts (u_id, content, image, creation_time) VALUES({}, "{}", "{}", \'{}\');'.format(user['id'], form.content.data, form.image.data.filename, datetime.now()))
         return redirect(url_for('stream', username=username))
     posts = query_db('SELECT p.*, u.*, (SELECT COUNT(*) FROM Comments WHERE p_id=p.id) AS cc FROM Posts AS p JOIN Users AS u ON u.id=p.u_id WHERE p.u_id IN (SELECT u_id FROM Friends WHERE f_id={0}) OR p.u_id IN (SELECT f_id FROM Friends WHERE u_id={0}) OR p.u_id={0} ORDER BY p.creation_time DESC;'.format(user['id']))
@@ -124,13 +123,13 @@ def comments(username, p_id):
     if session.get("username") != username:
         return redirect(url_for('index'))
     form = CommentsForm()
-    if form.is_submitted():
+    if form.validate_on_submit():
         user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
         query_db('INSERT INTO Comments (p_id, u_id, comment, creation_time) VALUES({}, {}, "{}", \'{}\');'.format(p_id, user['id'], form.comment.data, datetime.now()))
 
     post = query_db('SELECT * FROM Posts WHERE id={};'.format(p_id), one=True)
     all_comments = query_db('SELECT DISTINCT * FROM Comments AS c JOIN Users AS u ON c.u_id=u.id WHERE c.p_id={} ORDER BY c.creation_time DESC;'.format(p_id))
-    return render_template('comments.html', title='Comments', username=username, form=form, post=post, comments=all_comments)
+    return render_template('comments.html', title='Comments', username=username, form=form, post=post, comments=all_comments)    
 
 # page for seeing and adding friends
 @app.route('/friends/<username>', methods=['GET', 'POST'])
@@ -142,7 +141,7 @@ def friends(username):
         return redirect(url_for('index'))
     form = FriendsForm()
     user = query_db('SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
-    if form.is_submitted():
+    if form.validate_on_submit():
         friend = query_db('SELECT * FROM Users WHERE username="{}";'.format(form.username.data), one=True)
         if friend is None:
             flash('User does not exist')
@@ -185,11 +184,3 @@ def logout():
     logout_user()
     session["username"]=None
     return redirect(url_for('index'))
-
-def validations(s):
-    for c in s:
-        cat = unicodedata.category(c)
-        # Ll=lowercase, Lu=uppercase, Lo=ideographs, Nd=Numbers, All Z* is spaces 
-        if cat not in ('Ll','Lu','Lo','Nd','Zs', 'Zl', 'Zp'):
-            return False    
-    return True
