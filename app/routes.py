@@ -160,7 +160,7 @@ def profile(username):
     if session.get("username") != username:
         return redirect(url_for('index'))
     form = ProfileForm()
-    if form.is_submitted():
+    if form.validate_on_submit():
         query_db('UPDATE Users SET education="{}", employment="{}", music="{}", movie="{}", nationality="{}", birthday=\'{}\' WHERE username="{}" ;'.format(
             form.education.data, form.employment.data, form.music.data, form.movie.data, form.nationality.data, form.birthday.data, username
         ))

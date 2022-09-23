@@ -53,10 +53,10 @@ class FriendsForm( FlaskForm):
     submit = SubmitField('Add Friend')
 
 class ProfileForm( FlaskForm):
-    education = StringField('Education', render_kw={'placeholder': 'Highest education'})
-    employment = StringField('Employment', render_kw={'placeholder': 'Current employment'})
-    music = StringField('Favorite song', render_kw={'placeholder': 'Favorite song'})
-    movie = StringField('Favorite movie', render_kw={'placeholder': 'Favorite movie'})
-    nationality = StringField('Nationality', render_kw={'placeholder': 'Your nationality'})
+    education = StringField('Education', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Highest education'})
+    employment = StringField('Employment', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Current employment'})
+    music = StringField('Favorite song', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Favorite song'})
+    movie = StringField('Favorite movie', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Favorite movie'})
+    nationality = StringField('Nationality', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Your nationality'})
     birthday = DateField('Birthday')
     submit = SubmitField('Update Profile')
