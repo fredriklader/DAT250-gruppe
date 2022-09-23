@@ -21,16 +21,15 @@ from wsgiref.validate import validator
 #UserMixin,
 
 class LoginForm( FlaskForm):
-    username = StringField('Username', validators=[Length(min=4, max=15), Regexp('^.*[a-zA-ZøæåØÆÅ0-9\s-]$')], render_kw={'placeholder': 'Username'})
+    username = StringField('Username', render_kw={'placeholder': 'Username'})
     password = PasswordField('Password', render_kw={'placeholder': 'Password'})
     remember_me = BooleanField('Remember me') # TODO: It would be nice to have this feature implemented, probably by using cookies
     submit = SubmitField('Sign In')
 
 class RegisterForm(FlaskForm):
-    first_name = StringField('First Name', validators=[Length(min=2, max=30), Regexp('^.*[a-zA-ZøæåØÆÅ\s-]$')], render_kw={'placeholder': 'First Name'})
-    last_name = StringField('Last Name', validators=[Length(min=2, max=30), Regexp('^.*[a-zA-ZøæåØÆÅ\s-]$')], render_kw={'placeholder': 'Last Name'})
-    username = StringField('Username', validators=[Length(min=4, max=15), Regexp('^.*[a-zA-ZøæåØÆÅ0-9\s-]$')], render_kw={'placeholder': 'Username'})
-    
+    first_name = StringField('First Name', render_kw={'placeholder': 'First Name'})
+    last_name = StringField('Last Name', render_kw={'placeholder': 'Last Name'})
+    username = StringField('Username', render_kw={'placeholder': 'Username'})
     password = PasswordField('Password', render_kw={'placeholder': 'Password'})    
     confirm_password = PasswordField('Confirm Password', render_kw={'placeholder': 'Confirm Password'})
     submit = SubmitField('Sign Up')
