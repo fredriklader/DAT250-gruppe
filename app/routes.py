@@ -84,12 +84,13 @@ def index():
         elif len(form.register.username.data)<=4:
             flash('Username must contain at least 4 characters')
         #Printing if username is to long
-        elif len(form.register.username.data)<=16:
+        elif len(form.register.username.data)>=16:
             flash('Username can only contain up to 15 characters')
         
         #Printing if password is to short
         elif len(form.register.password.data)<8:
             flash('Password must contain at least 8 characters')
+            
         #Printing if password and confirm password is not equal
         else:
             flash('Sorry, passwords does not match!')
