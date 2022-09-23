@@ -86,11 +86,23 @@ def index():
         #Printing if username is to long
         elif len(form.register.username.data)>=16:
             flash('Username can only contain up to 15 characters')
+        #Printing if first_name is to short
+        elif len(form.register.first_name.data)<=2:
+            flash('It must contain at least 2 characters')
+        #Printing if first_name is to long
+        elif len(form.register.first_name.data)>=30:
+            flash('It must only contain up to 30 characters')
+        #Printing if first_name is to short
+        elif len(form.register.last_name.data)<=2:
+            flash('It must contain at least 2 characters')
+        #Printing if first_name is to long
+        elif len(form.register.last_name.data)>=30:
+            flash('It must only contain up to 30 characters')
+        
         
         #Printing if password is to short
         elif len(form.register.password.data)<8:
-            flash('Password must contain at least 8 characters')
-            
+            flash('Password must contain at least 8 characters')   
         #Printing if password and confirm password is not equal
         else:
             flash('Sorry, passwords does not match!')
