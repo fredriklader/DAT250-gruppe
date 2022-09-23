@@ -21,17 +21,17 @@ from wsgiref.validate import validator
 #UserMixin,
 
 class LoginForm( FlaskForm):
-    username = StringField('Username', render_kw={'placeholder': 'Username'})
+    username = StringField('Username', validators=[Length(min=4, max=15), Regexp('^.*[a-zA-ZøæåØÆÅ0-9\s-]$')], render_kw={'placeholder': 'Username'})
     password = PasswordField('Password', render_kw={'placeholder': 'Password'})
     remember_me = BooleanField('Remember me') # TODO: It would be nice to have this feature implemented, probably by using cookies
     submit = SubmitField('Sign In')
 
 class RegisterForm(FlaskForm):
-    first_name = StringField('First Name', render_kw={'placeholder': 'First Name'})
-    last_name = StringField('Last Name', render_kw={'placeholder': 'Last Name'})
-    # username = StringField('Username', validators=[InputRequired(), Length(min=3, max=15, message="At least 3 characters")], render_kw={'placeholder': 'Username'})
-    username = StringField('Username', validators=[InputRequired("Username must contain at least 4 characters!"), Length(min=4, max=15, message="Username must contain at least 4 characters!")], render_kw={'placeholder': 'Username'})
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=4, max=15, message="At least 4 characters")], render_kw={'placeholder': 'Password'})    
+    first_name = StringField('First Name', validators=[Length(min=2, max=30), Regexp('^.*[a-zA-ZøæåØÆÅ\s-]$')], render_kw={'placeholder': 'First Name'})
+    last_name = StringField('Last Name', validators=[Length(min=2, max=30), Regexp('^.*[a-zA-ZøæåØÆÅ\s-]$')], render_kw={'placeholder': 'Last Name'})
+    username = StringField('Username', validators=[Length(min=4, max=15), Regexp('^.*[a-zA-ZøæåØÆÅ0-9\s-]$')], render_kw={'placeholder': 'Username'})
+    
+    password = PasswordField('Password', render_kw={'placeholder': 'Password'})    
     confirm_password = PasswordField('Confirm Password', render_kw={'placeholder': 'Confirm Password'})
     submit = SubmitField('Sign Up')
 
@@ -40,12 +40,12 @@ class IndexForm(FlaskForm):
     register = FormField(RegisterForm)
 #UserMixin, 
 class PostForm(FlaskForm):
-    content = TextAreaField('New Post', validators=[Length(max=300), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters and numbers and .,!?')], render_kw={'placeholder': 'What are you thinking about?'})
+    content = TextAreaField('New Post', validators=[Length(max=300), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'What are you thinking about?'})
     image = FileField('Image')
     submit = SubmitField('Post')
 
 class CommentsForm( FlaskForm):
-    comment = TextAreaField('New Comment', validators=[Length(max=150), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')] , render_kw={'placeholder': 'What do you have to say?'})
+    comment = TextAreaField('New Comment', validators=[Length(max=150), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')] , render_kw={'placeholder': 'What do you have to say?'})
     submit = SubmitField('Comment')
 
 class FriendsForm( FlaskForm):
@@ -53,10 +53,10 @@ class FriendsForm( FlaskForm):
     submit = SubmitField('Add Friend')
 
 class ProfileForm( FlaskForm):
-    education = StringField('Education', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Highest education'})
-    employment = StringField('Employment', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Current employment'})
-    music = StringField('Favorite song', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Favorite song'})
-    movie = StringField('Favorite movie', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Favorite movie'})
-    nationality = StringField('Nationality', validators=[Length(max=50), Regexp('^.*[a-zA-Z0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Your nationality'})
+    education = StringField('Education', validators=[Length(max=50), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Highest education'})
+    employment = StringField('Employment', validators=[Length(max=50), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Current employment'})
+    music = StringField('Favorite song', validators=[Length(max=50), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Favorite song'})
+    movie = StringField('Favorite movie', validators=[Length(max=50), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Favorite movie'})
+    nationality = StringField('Nationality', validators=[Length(max=50), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'Your nationality'})
     birthday = DateField('Birthday')
     submit = SubmitField('Update Profile')

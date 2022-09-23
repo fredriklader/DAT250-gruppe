@@ -69,7 +69,7 @@ def index():
             flash('Username or password is incorrect!')
             session["count"]=int(session.get("count")) +1
 
-    elif form.register.is_submitted() and form.register.submit.data:
+    elif form.register.validate_on_submit() and form.register.submit.data:
         #Hashing password with salt
         hash_password=generate_password_hash(form.register.password.data, method="sha256", salt_length=8)
         #checking if username already exist
@@ -78,10 +78,12 @@ def index():
         #checking if confirm password and password is equal, and the length of username and password. Adding to database
         elif form.register.password.data==form.register.confirm_password.data and len(form.register.password.data)>=8 and len(form.register.username.data)>=4:
             query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES("{}", "{}", "{}", "{}");'.format(form.register.username.data, form.register.first_name.data,
-            form.register.last_name.data, hash_password))
-        #Printing if username is to short
-        elif len(form.register.username.data)<=4:
-            flash('Username must contain at least 4 characters')
+            form.register.last_name.data, hash_password))  
+             
+        # #Printing if username is to short
+        # elif len(form.register.username.data)<=4:
+        #     flash('Username must contain at least 4 characters')
+        
         #Printing if password is to short
         elif len(form.register.password.data)<8:
             flash('Password must contain at least 8 characters')
