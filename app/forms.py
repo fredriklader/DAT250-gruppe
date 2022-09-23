@@ -40,7 +40,7 @@ class IndexForm(FlaskForm):
 #UserMixin, 
 class PostForm(FlaskForm):
     content = TextAreaField('New Post', validators=[Length(max=300), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'What are you thinking about?'})
-    image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png','img'], 'Only jpg, png and img file types are allowed')])
+    image = FileField('Image', validators=[FileAllowed(['jpg', 'png','img'], 'Only jpg, png and img file types are allowed')])
     submit = SubmitField('Post')
 
 class CommentsForm( FlaskForm):
