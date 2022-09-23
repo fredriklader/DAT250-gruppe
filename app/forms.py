@@ -8,17 +8,12 @@ from app import app, query_db
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Length, DataRequired, Regexp
-
-
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from wsgiref.validate import validator
 # defines all forms in the application, these will be instantiated by the template,
 # and the routes.py will read the values of the fields
 # TODO: Add validation, maybe use wtforms.validators??
 # TODO: There was some important security feature that wtforms provides, but I don't remember what; implement it
-# login_manager = LoginManager(app)
-# login_manager.login_view="login"
-#UserMixin,
 
 class LoginForm( FlaskForm):
     username = StringField('Username', render_kw={'placeholder': 'Username'})
@@ -37,7 +32,7 @@ class RegisterForm(FlaskForm):
 class IndexForm(FlaskForm):
     login = FormField(LoginForm)
     register = FormField(RegisterForm)
-#UserMixin, 
+
 class PostForm(FlaskForm):
     content = TextAreaField('New Post', validators=[Length(max=300), Regexp('^.*[a-zA-ZøæåØÆÅ0-9_.,!?\s-]$', message='Only letters, numbers and .,!?')], render_kw={'placeholder': 'What are you thinking about?'})
     image = FileField('Image', validators=[FileAllowed(['jpg', 'png','img'], 'Only jpg, png and img file types are allowed')])

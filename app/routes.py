@@ -14,12 +14,6 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from functools import wraps
 from datetime import timedelta
 from config import User
-# from config import User
-# from django.contrib.auth import get_user_model
-# User = get_user_model()
-# from django.contrib.auth.models import get_user_model
-# User = get_user_model()
-# this file contains all the different routes, and the logic for communicating with the database
 
 
 #Session attempt counter deletet after 5 minutes

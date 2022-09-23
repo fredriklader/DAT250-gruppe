@@ -1,7 +1,6 @@
 from flask import Flask, g
 from config import Config
 from flask_bootstrap import Bootstrap
-#from flask_login import LoginManager
 import sqlite3
 import os
 
@@ -17,11 +16,6 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 app = Flask(__name__)
 Bootstrap(app)
 app.config.from_object(Config)
-
-# TODO: Handle login management better, maybe with flask_login?
-# login_manager = LoginManager(app)
-# login_manager.login_view="login"
-
 
 # get an instance of the db
 def get_db():
