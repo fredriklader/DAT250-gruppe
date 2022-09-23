@@ -1,5 +1,6 @@
 from email.mime import message
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_wtf import RecaptchaField
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FormField, TextAreaField, FileField
 from wtforms.fields.html5 import DateField
 from app import app, query_db
@@ -23,6 +24,7 @@ class LoginForm( FlaskForm):
     password = PasswordField('Password', render_kw={'placeholder': 'Password'})
     remember_me = BooleanField('Remember me') # TODO: It would be nice to have this feature implemented, probably by using cookies
     submit = SubmitField('Sign In')
+    recaptcha = RecaptchaField()
 
 class RegisterForm(FlaskForm):
     first_name = StringField('First Name', render_kw={'placeholder': 'First Name'})
@@ -32,6 +34,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=4, max=15, message="At least 2 characters")], render_kw={'placeholder': 'Password'})    
     confirm_password = PasswordField('Confirm Password', render_kw={'placeholder': 'Confirm Password'})
     submit = SubmitField('Sign Up')
+    recaptcha = RecaptchaField()
 
 class IndexForm(FlaskForm):
     login = FormField(LoginForm)

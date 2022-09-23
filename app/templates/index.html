@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% block content %}   
-<script src="https://www.google.com/recaptcha/api.js" async defer></script> 
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
         <h1 class="display-4">Social Insecurity</h1>
@@ -20,14 +19,10 @@
                     <form action="" method="POST" novalidate>
                         {{ wtf.form_field(form.login.username) }}
                         {{ wtf.form_field(form.login.password) }}
+                        {{ form.login.recaptcha }}
                         {{ wtf.form_field(form.login.remember_me) }}
                         {{ wtf.form_field(form.login.submit, class="btn btn-primary") }}
                     </form>
-                    <form action="?" method="POST">
-                        <div class="g-recaptcha" data-sitekey="6LcL5wMiAAAAAPM4DndciWogrDUsiKO6ExizChrQ"></div>
-                        <br/>
-                        <input type="submit" value="Submit">
-                      </form>
                 </div>
             </div>
         </div>
