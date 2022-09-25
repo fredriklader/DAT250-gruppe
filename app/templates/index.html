@@ -17,6 +17,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Access an existing profile</h5>
                     <form action="" method="POST" novalidate>
+                        {{ form.csrf_token }}
                         {{ wtf.form_field(form.login.username) }}
                         {{ wtf.form_field(form.login.password) }}
                         {{ form.login.recaptcha }}
