@@ -47,15 +47,19 @@ def index():
             flash('Username or password is incorrect!')
             #if username does not exist add session count +1
             session["count"]=int(session.get("count")) +1
+
         #checking the password entered with the password in the database
         elif check_password_hash(user['password'], form.login.password.data):
             #storing username in session for url managment
             session["username"] = user['username']
-            return redirect(url_for('stream', username=form.login.username.data))
+            recaptcha_reg_response = request.form['g-recaptcha-response']
+            if len(recaptcha_reg_response)>1:
+                return redirect(url_for('stream', username=form.login.username.data))
         else:
             #if password is incorrect add session count +1
             flash('Username or password is incorrect!')
             session["count"]=int(session.get("count")) +1
+            return redirect(url_for('index'))
 
     elif form.register.is_submitted() and form.register.submit.data:
         #Hashing password with salt
